@@ -1,5 +1,7 @@
-{
-"inbounds": [{
+"log": {
+      "loglevel": "info"
+    },
+    "inbounds": [{
       "port": 8080,
       "protocol": "vless",
       "settings": {
