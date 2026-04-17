@@ -1,0 +1,14 @@
+{
+  "urls": [
+    "vless://c60f60ee-fe9b-402f-952f-c7abc2f3e5e6@aure1337-vlessonnersing.hf.space:443?type=ws&path=/vless&security=tls#HuggingFace-Test",
+    "vless://05519058-d2ac-4f28-9e4a-2b2a1386749e@www.speedtest.net:443?type=ws&host=juzibaipiao.5112233.xyz&path=%2F&security=tls#Juzibaipiao",
+    "vless://884c9a17-0b8e-4a9f-a8e7-5f5d5c5e5f5e@cdn.discordapp.com:443?type=ws&host=nl1.vless.site&path=%2Fvless&security=tls#NL-Discord-CDN",
+    "vless://f584a5e8-8b3d-4b3e-8b3d-4b3e8b3d4b3e@www.speedtest.net:443?type=ws&host=de1.vless.site&path=%2Fvless&security=tls#DE-Speedtest",
+    "vless://3b5e3f4e-8b3d-4b3e-8b3d-4b3e8b3d4b3e@www.speedtest.net:443?type=ws&host=us1.vless.site&path=%2Fvless&security=tls#US-Speedtest",
+    "vless://7d8e9f0a-1b2c-3d4e-5f6a-7b8c9d0e1f2a@www.speedtest.net:443?type=ws&host=sg1.vless.site&path=%2Fvless&security=tls#SG-Speedtest",
+    "vless://a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d@cdn.cloudflare.com:443?type=ws&host=fr1.vless.site&path=%2Fvless&security=tls#FR-Cloudflare",
+    "vless://9f8e7d6c-5b4a-3210-fedc-ba9876543210@www.speedtest.net:443?type=ws&host=uk1.vless.site&path=%2Fvless&security=tls#UK-Speedtest",
+    "vless://1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d@cdn.jsdelivr.net:443?type=ws&host=ca1.vless.site&path=%2Fvless&security=tls#CA-JSDelivr",
+    "vless://fedcba98-7654-3210-fedc-ba9876543210@www.speedtest.net:443?type=ws&host=jp1.vless.site&path=%2Fvless&security=tls#JP-Speedtest"
+  ]
+}

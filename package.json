@@ -1,0 +1,13 @@
+{
+  "name": "vless-checker",
+  "version": "1.0.0",
+  "description": "VLESS subscription checker",
+  "main": "checker.js",
+  "scripts": {
+    "check": "node checker.js",
+    "start": "node checker.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}
