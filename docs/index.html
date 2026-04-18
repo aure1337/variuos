@@ -186,6 +186,34 @@
       Обновить данные
     </button>
 
+    <div class="subscription-section">
+      <h2 class="section-title">
+        <span class="title-icon">📲</span>
+        Подписки для приложений
+      </h2>
+      <p class="section-desc">Скопируй ссылку и добавь в Hiddify, v2rayNG или другое приложение</p>
+
+      <div class="subscription-cards">
+        <div class="subscription-card">
+          <div class="sub-icon">🌐</div>
+          <h3>WiFi подписка</h3>
+          <p>Все рабочие ключи (100+ серверов)</p>
+          <button class="sub-btn" onclick="copySubscription('wifi')">
+            📋 Копировать ссылку WiFi
+          </button>
+        </div>
+
+        <div class="subscription-card">
+          <div class="sub-icon">📱</div>
+          <h3>LTE подписка</h3>
+          <p>Топ-50 самых быстрых серверов</p>
+          <button class="sub-btn" onclick="copySubscription('lte')">
+            📋 Копировать ссылку LTE
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div id="cards"></div>
 
     <footer class="footer">

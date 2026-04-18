@@ -12,7 +12,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 BLACK_URL = "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/BLACK_VLESS_RUS.txt"
 BLACK_MOBILE_URL = "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/BLACK_VLESS_RUS_mobile.txt"
 WHITE_URL = "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/WHITE-CIDR-RU-checked.txt"
-TEMNUK_URL = "https://raw.githubusercontent.com/Temnuk/naabuzil/refs/heads/main/whitelist"
+TEMNUK_WIFI_URL = "https://raw.githubusercontent.com/Temnuk/naabuzil/refs/heads/main/wifi"
 
 MAX_WORKERS = 20
 TEST_TIMEOUT = 5
@@ -178,23 +178,20 @@ def main():
     black_mobile_keys = fetch_keys(BLACK_MOBILE_URL)
     print(f"Загружено {len(black_mobile_keys)} BLACK mobile ключей")
 
-    black_keys = list(dict.fromkeys(black_keys + black_mobile_keys))
+    print("Загружаем TEMNUK WiFi ключи...")
+    try:
+        temnuk_wifi_keys = fetch_keys(TEMNUK_WIFI_URL)
+        print(f"Загружено {len(temnuk_wifi_keys)} TEMNUK WiFi ключей")
+    except Exception as e:
+        print(f"Ошибка загрузки TEMNUK WiFi: {e}")
+        temnuk_wifi_keys = []
+
+    black_keys = list(dict.fromkeys(black_keys + black_mobile_keys + temnuk_wifi_keys))
     print(f"Итого уникальных BLACK ключей: {len(black_keys)}")
 
     print("Загружаем WHITE ключи...")
     white_keys = fetch_keys(WHITE_URL)
     print(f"Загружено {len(white_keys)} WHITE ключей")
-
-    print("Загружаем TEMNUK ключи...")
-    try:
-        temnuk_keys = fetch_keys(TEMNUK_URL)
-        print(f"Загружено {len(temnuk_keys)} TEMNUK ключей")
-    except Exception as e:
-        print(f"Ошибка загрузки TEMNUK: {e}")
-        temnuk_keys = []
-
-    white_keys = list(dict.fromkeys(white_keys + temnuk_keys))
-    print(f"Итого уникальных WHITE ключей: {len(white_keys)}")
 
     results = {
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
@@ -240,6 +237,87 @@ def main():
         json.dump(results, f, ensure_ascii=False, indent=2)
 
     print("Сохранено в docs/keys.json")
+
+    # Генерация подписок
+    print("\nГенерация подписок...")
+    generate_subscriptions(results)
+
+
+def generate_subscriptions(results):
+    """Генерирует файлы подписок для WiFi и LTE"""
+
+    # Собираем все рабочие ключи
+    all_working_keys = []
+
+    # BLACK ключи (обычный VPN)
+    for country in COUNTRIES.keys():
+        if country in results and results[country].get('top10'):
+            all_working_keys.extend([item['key'] for item in results[country]['top10']])
+
+    # Other countries
+    if 'other_countries' in results:
+        for country_data in results['other_countries'].values():
+            if country_data.get('top10'):
+                all_working_keys.extend([item['key'] for item in country_data['top10']])
+
+    # WHITE ключи (белые списки)
+    for mode in ["w_" + c for c in WHITE_COUNTRIES.keys()] + ["w_other", "russia"]:
+        if mode in results and results[mode].get('top10'):
+            all_working_keys.extend([item['key'] for item in results[mode]['top10']])
+
+    # Убираем дубликаты
+    all_working_keys = list(dict.fromkeys(all_working_keys))
+
+    # WiFi подписка (все ключи)
+    wifi_header = """#profile-title: 🌐 VPN Keys Hub WiFi
+#announce: Совет: Настройки>Подписки>Сортировать по пингу, затем нажми на спидометр. Меньше ms лучше, регулярно нажимайте на 🔄️
+#profile-update-interval: 1
+#support-url: https://github.com/aure1337/vless-private
+#profile-web-page-url: https://aure1337.github.io/vless-private/
+
+"""
+
+    with open("docs/subscribe_wifi.txt", "w", encoding="utf-8") as f:
+        f.write(wifi_header)
+        f.write("\n".join(all_working_keys))
+
+    print(f"✅ WiFi подписка: {len(all_working_keys)} ключей → docs/subscribe_wifi.txt")
+
+    # LTE подписка (топ-50 самых быстрых)
+    # Собираем ключи с latency
+    keys_with_latency = []
+
+    for country in COUNTRIES.keys():
+        if country in results and results[country].get('top10'):
+            keys_with_latency.extend(results[country]['top10'])
+
+    if 'other_countries' in results:
+        for country_data in results['other_countries'].values():
+            if country_data.get('top10'):
+                keys_with_latency.extend(country_data['top10'])
+
+    for mode in ["w_" + c for c in WHITE_COUNTRIES.keys()] + ["w_other", "russia"]:
+        if mode in results and results[mode].get('top10'):
+            keys_with_latency.extend(results[mode]['top10'])
+
+    # Сортируем по latency и берем топ-50
+    keys_with_latency.sort(key=lambda x: x['latency_ms'])
+    top_lte_keys = [item['key'] for item in keys_with_latency[:50]]
+    top_lte_keys = list(dict.fromkeys(top_lte_keys))  # Убираем дубликаты
+
+    lte_header = """#profile-title: 📱 VPN Keys Hub LTE
+#announce: Совет: Настройки>Подписки>Сортировать по пингу, затем нажми на спидометр. Меньше ms лучше, регулярно нажимайте на 🔄️
+#profile-update-interval: 1
+#support-url: https://github.com/aure1337/vless-private
+#profile-web-page-url: https://aure1337.github.io/vless-private/
+
+"""
+
+    with open("docs/subscribe_lte.txt", "w", encoding="utf-8") as f:
+        f.write(lte_header)
+        f.write("\n".join(top_lte_keys))
+
+    print(f"✅ LTE подписка: {len(top_lte_keys)} ключей (топ-50 быстрых) → docs/subscribe_lte.txt")
 
 
 if __name__ == "__main__":
