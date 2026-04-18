@@ -15,6 +15,16 @@ const MODES = [
   { key: 'w_sweden',      label: '🇸🇪 Швеция',            section: 'white' },
   { key: 'w_netherlands', label: '🇳🇱 Нидерланды',        section: 'white' },
   { key: 'w_poland',      label: '🇵🇱 Польша',            section: 'white' },
+  { key: 'w_france',      label: '🇫🇷 Франция',           section: 'white' },
+  { key: 'w_uk',          label: '🇬🇧 Великобритания',    section: 'white' },
+  { key: 'w_usa',         label: '🇺🇸 США',               section: 'white' },
+  { key: 'w_canada',      label: '🇨🇦 Канада',            section: 'white' },
+  { key: 'w_japan',       label: '🇯🇵 Япония',            section: 'white' },
+  { key: 'w_singapore',   label: '🇸🇬 Сингапур',          section: 'white' },
+  { key: 'w_australia',   label: '🇦🇺 Австралия',         section: 'white' },
+  { key: 'w_spain',       label: '🇪🇸 Испания',           section: 'white' },
+  { key: 'w_italy',       label: '🇮🇹 Италия',            section: 'white' },
+  { key: 'w_switzerland', label: '🇨🇭 Швейцария',         section: 'white' },
   { key: 'w_other',       label: '🌍 Остальные',           section: 'white' },
   { key: 'russia',        label: '🇷🇺 Россия (Москва)',    section: 'white' },
 ];
@@ -23,9 +33,9 @@ let currentMode = null;
 
 function makeCard(m) {
   return '<div class="card" id="card-' + m.key + '" style="display:none">' +
-    '<h2>Лучший ключ — ' + m.label + '</h2>' +
+    '<h2>🔑 ' + m.label + '</h2>' +
     '<div class="key-box empty" id="key-' + m.key + '">Загрузка...</div>' +
-    '<button class="copy-btn" id="btn-' + m.key + '" disabled onclick="copyKey(\'' + m.key + '\')">Копировать</button>' +
+    '<button class="copy-btn" id="btn-' + m.key + '" disabled onclick="copyKey(\'' + m.key + '\')">📋 Копировать ключ</button>' +
     '<div class="top5" id="top5-' + m.key + '"></div>' +
     '<div class="stats" id="stats-' + m.key + '"></div>' +
     '</div>';
@@ -38,13 +48,14 @@ function buildCards() {
 
 function switchMode(mode) {
   currentMode = mode;
-  document.querySelectorAll('.tab').forEach(t => {
+  document.querySelectorAll('.country-btn').forEach(t => {
     const onclick = t.getAttribute('onclick');
     t.classList.toggle('active', onclick === "switchMode('" + mode + "')");
   });
   MODES.forEach(m => {
     document.getElementById('card-' + m.key).style.display = m.key === mode ? 'block' : 'none';
   });
+  window.scrollTo({ top: document.getElementById('cards').offsetTop - 100, behavior: 'smooth' });
 }
 
 async function loadData() {
@@ -114,7 +125,7 @@ function setupCollapsed(collapsedId, toggleId, labelId, emptyTabs) {
   collapsed.innerHTML = '';
   if (emptyTabs.length > 0) {
     emptyTabs.forEach(btn => { collapsed.appendChild(btn); });
-    label.textContent = 'Нет ключей: ' + emptyTabs.length;
+    label.textContent = 'Недоступно: ' + emptyTabs.length + ' стран';
     toggle.style.display = 'flex';
   } else {
     toggle.style.display = 'none';
@@ -188,13 +199,13 @@ function render(mode) {
 
   const topList = d.top10 || d.top5;
   if (topList && topList.length >= 1) {
-    top5El.innerHTML = '<h3>ТОП-10 быстрых:</h3>' +
+    top5El.innerHTML = '<h3>⚡ ТОП-10 самых быстрых серверов:</h3>' +
       topList.map((k, i) =>
         '<div class="top5-item">' +
         '<span class="host">' + (i + 1) + '. ' + k.host + ':' + k.port + '</span>' +
         '<span class="latency">' + k.latency_ms + ' мс</span>' +
-        (k.first_seen ? '<span class="uptime">в сети ' + formatUptime(k.first_seen) + '</span>' : '') +
-        '<button class="copy-small" onclick="copyText(\'' + encodeKey(k.key) + '\', this)">копировать</button>' +
+        (k.first_seen ? '<span class="uptime">⏱ ' + formatUptime(k.first_seen) + '</span>' : '') +
+        '<button class="copy-small" onclick="copyText(\'' + encodeKey(k.key) + '\', this)">Копировать</button>' +
         '</div>'
       ).join('');
   } else {
@@ -221,8 +232,12 @@ function copyKey(mode) {
 function copyText(text, btn) {
   navigator.clipboard.writeText(text).then(() => {
     const orig = btn.textContent;
-    btn.textContent = 'Скопировано!';
-    setTimeout(() => btn.textContent = orig, 1500);
+    btn.textContent = '✅ Скопировано!';
+    btn.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.background = '';
+    }, 2000);
   });
 }
 

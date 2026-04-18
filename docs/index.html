@@ -4,100 +4,237 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VLESS Key Checker — бесплатные рабочие VLESS-ключи для России</title>
+  <title>VPN Keys Hub — Бесплатные VLESS ключи для России</title>
 
   <!-- SEO -->
   <meta name="description"
-    content="Автоматически обновляемые бесплатные VLESS-ключи для обхода блокировок в России. Проверенные серверы Эстония, Финляндия, Германия, Швеция, Нидерланды. Совместимо с v2rayTUN, Hiddify, Streisand." />
+    content="Автоматически обновляемые бесплатные VLESS-ключи для обхода блокировок. Проверенные серверы по всему миру." />
   <meta name="keywords"
-    content="VLESS ключи, бесплатный VPN Россия, обход блокировок, VLESS бесплатно, v2ray ключи, Hiddify ключи, VPN для России 2025, VLESS checker" />
-  <meta name="author" content="tiagorrg" />
+    content="VLESS ключи, бесплатный VPN, обход блокировок, VLESS бесплатно, v2ray ключи" />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://tiagorrg.github.io/vless-checker/" />
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="VLESS Key Checker — бесплатные рабочие ключи" />
-  <meta property="og:description"
-    content="Автоматически обновляемые VLESS-ключи для обхода блокировок. Проверяются каждые 30 минут." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://tiagorrg.github.io/vless-checker/" />
 
   <link rel="icon"
-    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔑</text></svg>" />
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
 
-  <h1>VLESS Key Checker</h1>
-  <p class="subtitle" id="updated">Загружаем данные...</p>
+  <div class="container">
+    <header class="hero">
+      <div class="logo">
+        <span class="logo-icon">🚀</span>
+        <h1>VPN Keys Hub</h1>
+      </div>
+      <p class="tagline">Свободный интернет без границ</p>
+      <div class="status-badge" id="status-badge">
+        <span class="pulse"></span>
+        <span id="updated">Загрузка...</span>
+      </div>
+    </header>
 
-  <div class="github-link">
-    <a href="https://github.com/tiagorrg/vless-checker" target="_blank">
-      <svg height="14" viewBox="0 0 16 16" fill="#666" xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+    <div class="info-cards">
+      <div class="info-card">
+        <div class="info-icon">⚡</div>
+        <h3>Быстро</h3>
+        <p>Автоматический выбор самых быстрых серверов</p>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">🔄</div>
+        <h3>Актуально</h3>
+        <p>Обновление каждые 30 минут</p>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">🌍</div>
+        <h3>Глобально</h3>
+        <p>Серверы в 20+ странах мира</p>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <h2 class="section-title">
+        <span class="title-icon">📖</span>
+        Как использовать
+      </h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Выбери страну</h4>
+            <p>Для обычного VPN или белого списка (только заблокированные сайты)</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Скопируй ключ</h4>
+            <p>Нажми на кнопку "Копировать" под выбранным сервером</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Вставь в приложение</h4>
+            <p>Используй Hiddify, v2rayTUN, Streisand или любой VLESS клиент</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="servers-section">
+      <h2 class="section-title">
+        <span class="title-icon">🌐</span>
+        Обычный VPN
+      </h2>
+      <p class="section-desc">Весь трафик идет через VPN сервер</p>
+
+      <div class="country-grid" id="tabs-countries">
+        <button class="country-btn" onclick="switchMode('baltics')">
+          <span class="flag">🇱🇹🇪🇪🇱🇻</span>
+          <span class="name">Прибалтика</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('finland')">
+          <span class="flag">🇫🇮</span>
+          <span class="name">Финляндия</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('germany')">
+          <span class="flag">🇩🇪</span>
+          <span class="name">Германия</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('sweden')">
+          <span class="flag">🇸🇪</span>
+          <span class="name">Швеция</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('netherlands')">
+          <span class="flag">🇳🇱</span>
+          <span class="name">Нидерланды</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('poland')">
+          <span class="flag">🇵🇱</span>
+          <span class="name">Польша</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('other')">
+          <span class="flag">🌍</span>
+          <span class="name">Остальные</span>
+        </button>
+      </div>
+
+      <button class="show-more" id="collapsed-toggle" onclick="toggleCollapsed()">
+        <span id="collapsed-label">Показать недоступные</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </button>
+      <div class="country-grid collapsed" id="tabs-collapsed"></div>
+    </div>
+
+    <div class="servers-section">
+      <h2 class="section-title">
+        <span class="title-icon">📋</span>
+        Белые списки
+      </h2>
+      <p class="section-desc">Только заблокированные сайты через VPN, остальное напрямую</p>
+
+      <div class="country-grid" id="tabs-white">
+        <button class="country-btn" onclick="switchMode('w_baltics')">
+          <span class="flag">🇱🇹🇪🇪🇱🇻</span>
+          <span class="name">Прибалтика</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_finland')">
+          <span class="flag">🇫🇮</span>
+          <span class="name">Финляндия</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_germany')">
+          <span class="flag">🇩🇪</span>
+          <span class="name">Германия</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_sweden')">
+          <span class="flag">🇸🇪</span>
+          <span class="name">Швеция</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_netherlands')">
+          <span class="flag">🇳🇱</span>
+          <span class="name">Нидерланды</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_poland')">
+          <span class="flag">🇵🇱</span>
+          <span class="name">Польша</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_france')">
+          <span class="flag">🇫🇷</span>
+          <span class="name">Франция</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_uk')">
+          <span class="flag">🇬🇧</span>
+          <span class="name">Великобритания</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_usa')">
+          <span class="flag">🇺🇸</span>
+          <span class="name">США</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_canada')">
+          <span class="flag">🇨🇦</span>
+          <span class="name">Канада</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_japan')">
+          <span class="flag">🇯🇵</span>
+          <span class="name">Япония</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_singapore')">
+          <span class="flag">🇸🇬</span>
+          <span class="name">Сингапур</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_australia')">
+          <span class="flag">🇦🇺</span>
+          <span class="name">Австралия</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_spain')">
+          <span class="flag">🇪🇸</span>
+          <span class="name">Испания</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_italy')">
+          <span class="flag">🇮🇹</span>
+          <span class="name">Италия</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_switzerland')">
+          <span class="flag">🇨🇭</span>
+          <span class="name">Швейцария</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('w_other')">
+          <span class="flag">🌍</span>
+          <span class="name">Остальные</span>
+        </button>
+        <button class="country-btn" onclick="switchMode('russia')">
+          <span class="flag">🇷🇺</span>
+          <span class="name">Россия (МСК)</span>
+        </button>
+      </div>
+
+      <button class="show-more" id="collapsed-toggle-white" onclick="toggleCollapsedWhite()">
+        <span id="collapsed-label-white">Показать недоступные</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </button>
+      <div class="country-grid collapsed" id="tabs-collapsed-white"></div>
+    </div>
+
+    <button class="refresh-btn" onclick="loadData()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
       </svg>
-      tiagorrg/vless-checker
-    </a>
+      Обновить данные
+    </button>
+
+    <div id="cards"></div>
+
+    <footer class="footer">
+      <p>🚀 VPN Keys Hub — Свободный интернет для всех</p>
+      <p class="footer-note">Все ключи проверяются автоматически каждые 30 минут</p>
+    </footer>
   </div>
 
-  <div class="guide">
-    <h3>Как пользоваться</h3>
-    <ol>
-      <li>Выбери страну для <span>обычного VPN</span> — рекомендуются Прибалтика, Финляндия, Германия, Швеция, Нидерланды, Польша</li>
-      <li>Или выбери страну в разделе <span>Белые списки</span> — только заблокированные сайты идут через VPN, <span>Россия (Москва)</span> — через московские серверы</li>
-      <li>Нажми <span>Копировать</span> и вставь ключ в приложение (Hiddify, v2rayTUN, Streisand)</li>
-      <li>Ключи обновляются автоматически <span>каждые 30 минут</span></li>
-    </ol>
-  </div>
-
-  <p class="section-label">Обычный VPN — выбери страну</p>
-  <div class="tabs" id="tabs-countries">
-    <button class="tab" onclick="switchMode('baltics')">🇱🇹🇪🇪🇱🇻 Прибалтика</button>
-    <button class="tab" onclick="switchMode('finland')">🇫🇮 Финляндия</button>
-    <button class="tab" onclick="switchMode('germany')">🇩🇪 Германия</button>
-    <button class="tab" onclick="switchMode('sweden')">🇸🇪 Швеция</button>
-    <button class="tab" onclick="switchMode('netherlands')">🇳🇱 Нидерланды</button>
-    <button class="tab" onclick="switchMode('poland')">🇵🇱 Польша</button>
-    <button class="tab" onclick="switchMode('other')">🌍 Остальные</button>
-  </div>
-
-  <button class="collapsed-toggle" id="collapsed-toggle" onclick="toggleCollapsed()">
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M2 4l4 4 4-4" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-    <span id="collapsed-label">Нет ключей: ...</span>
-  </button>
-  <div class="tabs-collapsed" id="tabs-collapsed"></div>
-
-  <hr class="tabs-divider" />
-
-  <p class="section-label">Белые списки — выбери страну</p>
-  <div class="tabs" id="tabs-white">
-    <button class="tab" onclick="switchMode('w_baltics')">🇱🇹🇪🇪🇱🇻 Прибалтика</button>
-    <button class="tab" onclick="switchMode('w_finland')">🇫🇮 Финляндия</button>
-    <button class="tab" onclick="switchMode('w_germany')">🇩🇪 Германия</button>
-    <button class="tab" onclick="switchMode('w_sweden')">🇸🇪 Швеция</button>
-    <button class="tab" onclick="switchMode('w_netherlands')">🇳🇱 Нидерланды</button>
-    <button class="tab" onclick="switchMode('w_poland')">🇵🇱 Польша</button>
-    <button class="tab" onclick="switchMode('w_other')">🌍 Остальные</button>
-    <button class="tab" onclick="switchMode('russia')">🇷🇺 Россия (Москва)</button>
-  </div>
-
-  <button class="collapsed-toggle" id="collapsed-toggle-white" onclick="toggleCollapsedWhite()">
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M2 4l4 4 4-4" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-    <span id="collapsed-label-white">Нет ключей: ...</span>
-  </button>
-  <div class="tabs-collapsed" id="tabs-collapsed-white"></div>
-
-  <button class="refresh-btn" onclick="loadData()" style="margin-top:20px">Обновить</button>
-
-  <div id="cards"></div>
-
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=3"></script>
 </body>
 
 </html>

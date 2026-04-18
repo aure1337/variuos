@@ -1,30 +1,100 @@
 #!/usr/bin/env python3
+import re
 import requests
 import socket
 import time
-import sys
+import json
+import os
+from collections import defaultdict
+from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# Прямая ссылка на raw-файл с ключами
-GITHUB_RAW_URL = "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/BLACK_VLESS_RUS.txt"
+BLACK_URL = "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/BLACK_VLESS_RUS.txt"
+BLACK_MOBILE_URL = "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/BLACK_VLESS_RUS_mobile.txt"
+WHITE_URL = "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/WHITE-CIDR-RU-checked.txt"
+ZIENG_URL = "https://raw.githubusercontent.com/zieng2/wl/refs/heads/main/vless_lite.txt"
 
-MAX_WORKERS = 15       # сколько ключей проверять параллельно
-TEST_TIMEOUT = 5       # таймаут подключения в секундах
-MAX_LATENCY_MS = 2000  # ключи медленнее этого — отбрасываем
+MAX_WORKERS = 20
+TEST_TIMEOUT = 5
+MAX_LATENCY_MS = 2000
+
+COUNTRIES = {
+    "baltics":     ["lithuania", "estonia", "latvia"],
+    "finland":     ["finland"],
+    "germany":     ["germany"],
+    "sweden":      ["sweden"],
+    "netherlands": ["netherlands"],
+    "poland":      ["poland"],
+}
+
+WHITE_COUNTRIES = {
+    "baltics":     ["lithuania", "estonia", "latvia"],
+    "finland":     ["finland"],
+    "germany":     ["germany"],
+    "sweden":      ["sweden"],
+    "netherlands": ["netherlands"],
+    "poland":      ["poland"],
+    "france":      ["france"],
+    "uk":          ["united kingdom", "uk", "london"],
+    "usa":         ["united states", "usa", "america"],
+    "canada":      ["canada"],
+    "japan":       ["japan"],
+    "singapore":   ["singapore"],
+    "australia":   ["australia"],
+    "spain":       ["spain"],
+    "italy":       ["italy"],
+    "switzerland": ["switzerland"],
+}
+
+COUNTRIES_ALL_KEYWORDS = [kw for kws in COUNTRIES.values() for kw in kws]
+WHITE_COUNTRIES_ALL_KEYWORDS = [kw for kws in WHITE_COUNTRIES.values() for kw in kws]
+
+SKIP_COUNTRY_NAMES = {"anycast", "anycast-ip", "unknown"}
+
+
+
+def parse_country_from_key(key):
+    """Returns (country_name, flag_emoji) parsed from the key's URL fragment."""
+    if '#' not in key:
+        return None, None
+    from urllib.parse import unquote
+    fragment = unquote(key.split('#', 1)[1])
+    match = re.search(
+        r'([A-Z][A-Za-z\u00C0-\u017E](?:[A-Za-z\u00C0-\u017E\s\-]*[A-Za-z\u00C0-\u017E])?)(?:\s*[,|])',
+        fragment
+    )
+    if not match:
+        return None, None
+    country = match.group(1).strip()
+    flag = fragment[:match.start()].strip()
+    return country, flag
 
 
 def fetch_keys(url):
-    print(f"📥 Загружаем ключи из GitHub...")
-    try:
-        resp = requests.get(url, timeout=15)
-        resp.raise_for_status()
-        lines = resp.text.strip().splitlines()
-        keys = [line.strip() for line in lines if line.strip().startswith("vless://")]
-        print(f"✅ Найдено {len(keys)} VLESS-ключей\n")
-        return keys
-    except Exception as e:
-        print(f"❌ Ошибка загрузки: {e}")
-        sys.exit(1)
+    resp = requests.get(url, timeout=15)
+    resp.raise_for_status()
+    lines = resp.text.strip().splitlines()
+    return [line.strip() for line in lines if line.strip().startswith("vless://")]
+
+
+def filter_keys(keys, mode):
+    countries_dict = WHITE_COUNTRIES if mode.startswith("w_") or mode == "russia" else COUNTRIES
+
+    if mode in countries_dict:
+        keywords = countries_dict[mode]
+        return [k for k in keys if any(kw in k.lower() for kw in keywords)]
+    if mode == "other":
+        return [k for k in keys if not any(kw in k.lower() for kw in COUNTRIES_ALL_KEYWORDS) and "russia" not in k.lower()]
+    if mode == "russia":
+        return [k for k in keys if "russia" in k.lower()]
+    if mode.startswith("w_"):
+        country = mode[2:]
+        if country in WHITE_COUNTRIES:
+            keywords = WHITE_COUNTRIES[country]
+            return [k for k in keys if any(kw in k.lower() for kw in keywords)]
+        if country == "other":
+            return [k for k in keys if not any(kw in k.lower() for kw in WHITE_COUNTRIES_ALL_KEYWORDS) and "russia" not in k.lower()]
+    return keys
 
 
 def parse_host_port(key):
@@ -44,66 +114,139 @@ def parse_host_port(key):
 def test_key(key):
     host, port = parse_host_port(key)
     if not host:
-        return {"key": key, "host": "?", "port": "?", "status": "invalid", "latency_ms": None}
-    
-    start = time.time()
+        return None
     try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(TEST_TIMEOUT)
-        result = sock.connect_ex((host, port))
-        sock.close()
-        elapsed = round((time.time() - start) * 1000, 1)
-        
-        if result == 0:
-            return {"key": key, "host": host, "port": port, "status": "ok", "latency_ms": elapsed}
-        else:
-            return {"key": key, "host": host, "port": port, "status": "closed", "latency_ms": None}
+        infos = socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM)
     except Exception:
-        return {"key": key, "host": host, "port": port, "status": "error", "latency_ms": None}
+        return None
+    best = None
+    for (family, socktype, proto, canonname, sockaddr) in infos:
+        start = time.time()
+        try:
+            sock = socket.socket(family, socktype)
+            sock.settimeout(TEST_TIMEOUT)
+            result = sock.connect_ex(sockaddr)
+            sock.close()
+            elapsed = round((time.time() - start) * 1000, 1)
+            if result == 0 and elapsed <= MAX_LATENCY_MS:
+                if best is None or elapsed < best["latency_ms"]:
+                    best = {"key": key, "host": host, "port": port, "latency_ms": elapsed}
+        except Exception:
+            pass
+    return best
+
+
+def check_mode(keys, old_first_seen=None):
+    if old_first_seen is None:
+        old_first_seen = {}
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    working = []
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        futures = {executor.submit(test_key, key): key for key in keys}
+        for future in as_completed(futures):
+            result = future.result()
+            if result:
+                working.append(result)
+
+    working.sort(key=lambda x: x["latency_ms"])
+
+    for r in working:
+        r["first_seen"] = old_first_seen.get(r["key"], now)
+
+    return {
+        "best": working[0]["key"] if working else None,
+        "top10": working[:10],
+        "total_working": len(working),
+        "total": len(keys),
+    }
+
+
+def load_old_first_seen():
+    try:
+        with open("docs/keys.json", "r", encoding="utf-8") as f:
+            old = json.load(f)
+        seen = {}
+        for mode_data in old.values():
+            top_key = "top10" if "top10" in mode_data else "top5"
+            if isinstance(mode_data, dict) and top_key in mode_data:
+                for entry in mode_data[top_key]:
+                    if "key" in entry and "first_seen" in entry:
+                        seen[entry["key"]] = entry["first_seen"]
+        return seen
+    except Exception:
+        return {}
 
 
 def main():
-    keys = fetch_keys(GITHUB_RAW_URL)
+    old_first_seen = load_old_first_seen()
 
-    print(f"🔍 Тестируем {len(keys)} ключей...\n")
-    results = []
-    
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = {executor.submit(test_key, key): key for key in keys}
-        done = 0
-        for future in as_completed(futures):
-            r = future.result()
-            done += 1
-            icon = "✅" if r["status"] == "ok" else "❌"
-            latency = f"{r['latency_ms']} мс" if r["latency_ms"] else "недоступен"
-            print(f"[{done}/{len(keys)}] {icon} {r['host']}:{r['port']} — {latency}")
-            results.append(r)
+    print("Загружаем BLACK ключи...")
+    black_keys = fetch_keys(BLACK_URL)
+    print(f"Загружено {len(black_keys)} BLACK ключей")
 
-    # Фильтруем и сортируем
-    working = sorted(
-        [r for r in results if r["status"] == "ok" and r["latency_ms"] <= MAX_LATENCY_MS],
-        key=lambda x: x["latency_ms"]
-    )
+    print("Загружаем BLACK mobile ключи...")
+    black_mobile_keys = fetch_keys(BLACK_MOBILE_URL)
+    print(f"Загружено {len(black_mobile_keys)} BLACK mobile ключей")
 
-    print("\n" + "="*55)
-    print(f"📊 ИТОГ: рабочих {len(working)} из {len(keys)}")
-    print("="*55)
+    print("Загружаем ZIENG ключи...")
+    try:
+        zieng_keys = fetch_keys(ZIENG_URL)
+        print(f"Загружено {len(zieng_keys)} ZIENG ключей")
+    except Exception as e:
+        print(f"Ошибка загрузки ZIENG: {e}")
+        zieng_keys = []
 
-    if working:
-        print(f"\n🏆 ТОП-5 самых быстрых:")
-        for i, r in enumerate(working[:5], 1):
-            print(f"  {i}. {r['host']}:{r['port']} — {r['latency_ms']} мс")
+    black_keys = list(dict.fromkeys(black_keys + black_mobile_keys + zieng_keys))
+    print(f"Итого уникальных BLACK ключей: {len(black_keys)}")
 
-        # Сохраняем рабочие ключи
-        with open("working_keys.txt", "w") as f:
-            for r in working:
-                f.write(r["key"] + "\n")
-        print(f"\n💾 Все рабочие ключи сохранены в working_keys.txt")
+    print("Загружаем WHITE ключи...")
+    white_keys = fetch_keys(WHITE_URL)
+    print(f"Загружено {len(white_keys)} WHITE ключей")
 
-        print(f"\n⚡ ЛУЧШИЙ КЛЮЧ (скопируй в приложение):")
-        print(f"\n{working[0]['key']}\n")
-    else:
-        print("😕 Рабочих ключей не найдено. Попробуй позже.")
+    results = {
+        "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+    }
+
+    for country in list(COUNTRIES.keys()):
+        filtered = filter_keys(black_keys, country)
+        print(f"[{country}] {len(filtered)} ключей, проверяем...")
+        results[country] = check_mode(filtered, old_first_seen)
+        print(f"[{country}] Рабочих: {results[country]['total_working']}/{results[country]['total']}")
+
+    other_keys = filter_keys(black_keys, "other")
+    print(f"[other] {len(other_keys)} ключей, группируем по странам...")
+    country_groups = defaultdict(list)
+    country_flags = {}
+    for key in other_keys:
+        name, flag = parse_country_from_key(key)
+        if not name or name.lower() in SKIP_COUNTRY_NAMES:
+            name = "Other"
+            flag = "🌍"
+        country_groups[name].append(key)
+        if name not in country_flags:
+            country_flags[name] = flag
+
+    other_countries = {}
+    for name, keys in country_groups.items():
+        print(f"  [{name}] {len(keys)} ключей, проверяем...")
+        checked = check_mode(keys, old_first_seen)
+        print(f"  [{name}] Рабочих: {checked['total_working']}/{checked['total']}")
+        checked["flag"] = country_flags[name]
+        other_countries[name] = checked
+    results["other_countries"] = other_countries
+
+    white_modes = ["w_" + c for c in WHITE_COUNTRIES.keys()] + ["w_other", "russia"]
+    for mode in white_modes:
+        filtered = filter_keys(white_keys, mode)
+        print(f"[{mode}] {len(filtered)} ключей, проверяем...")
+        results[mode] = check_mode(filtered, old_first_seen)
+        print(f"[{mode}] Рабочих: {results[mode]['total_working']}/{results[mode]['total']}")
+
+    os.makedirs("docs", exist_ok=True)
+    with open("docs/keys.json", "w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+
+    print("Сохранено в docs/keys.json")
 
 
 if __name__ == "__main__":
