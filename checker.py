@@ -13,6 +13,9 @@ BLACK_URL = "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/ma
 BLACK_MOBILE_URL = "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/BLACK_VLESS_RUS_mobile.txt"
 WHITE_URL = "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/WHITE-CIDR-RU-checked.txt"
 TEMNUK_WIFI_URL = "https://raw.githubusercontent.com/Temnuk/naabuzil/refs/heads/main/wifi"
+TEMNUK_LTE_URL = "https://raw.githubusercontent.com/Temnuk/naabuzil/refs/heads/main/lte"
+TEMNUK_WHITELIST_URL = "https://raw.githubusercontent.com/Temnuk/naabuzil/refs/heads/main/whitelist"
+SILENTGHOST_URL = "https://raw.githubusercontent.com/SilentGhostCodes/WhiteListVpn/refs/heads/main/Whitelist%20%E2%84%962.txt"
 
 MAX_WORKERS = 20
 TEST_TIMEOUT = 5
@@ -64,7 +67,19 @@ def fetch_keys(url):
     resp = requests.get(url, timeout=15)
     resp.raise_for_status()
     lines = resp.text.strip().splitlines()
-    return [line.strip() for line in lines if line.strip().startswith("vless://")]
+    keys = [line.strip() for line in lines if line.strip().startswith("vless://")]
+
+    # Очистка от рекламы в именах ключей
+    cleaned_keys = []
+    for key in keys:
+        # Убираем рекламные домены из имен
+        key = key.replace('@xex_vpn', '@server')
+        key = key.replace('@XEX_VPN', '@server')
+        key = key.replace('xex_vpn', 'server')
+        key = key.replace('XEX_VPN', 'server')
+        cleaned_keys.append(key)
+
+    return cleaned_keys
 
 
 def filter_keys(keys, mode):
@@ -192,6 +207,25 @@ def main():
     print("Загружаем WHITE ключи...")
     white_keys = fetch_keys(WHITE_URL)
     print(f"Загружено {len(white_keys)} WHITE ключей")
+
+    print("Загружаем TEMNUK Whitelist ключи...")
+    try:
+        temnuk_white_keys = fetch_keys(TEMNUK_WHITELIST_URL)
+        print(f"Загружено {len(temnuk_white_keys)} TEMNUK Whitelist ключей")
+    except Exception as e:
+        print(f"Ошибка загрузки TEMNUK Whitelist: {e}")
+        temnuk_white_keys = []
+
+    print("Загружаем SilentGhost Whitelist ключи...")
+    try:
+        silentghost_keys = fetch_keys(SILENTGHOST_URL)
+        print(f"Загружено {len(silentghost_keys)} SilentGhost ключей")
+    except Exception as e:
+        print(f"Ошибка загрузки SilentGhost: {e}")
+        silentghost_keys = []
+
+    white_keys = list(dict.fromkeys(white_keys + temnuk_white_keys + silentghost_keys))
+    print(f"Итого уникальных WHITE ключей: {len(white_keys)}")
 
     results = {
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
