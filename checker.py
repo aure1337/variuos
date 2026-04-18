@@ -16,6 +16,12 @@ TEMNUK_WIFI_URL = "https://raw.githubusercontent.com/Temnuk/naabuzil/refs/heads/
 TEMNUK_LTE_URL = "https://raw.githubusercontent.com/Temnuk/naabuzil/refs/heads/main/lte"
 TEMNUK_WHITELIST_URL = "https://raw.githubusercontent.com/Temnuk/naabuzil/refs/heads/main/whitelist"
 SILENTGHOST_URL = "https://raw.githubusercontent.com/SilentGhostCodes/WhiteListVpn/refs/heads/main/Whitelist%20%E2%84%962.txt"
+SILENTGHOST_WHITELIST_URL = "https://raw.githubusercontent.com/SilentGhostCodes/WhiteListVpn/refs/heads/main/Whitelist.txt"
+SILENTGHOST_BYPASS_URL = "https://raw.githubusercontent.com/SilentGhostCodes/WhiteListVpn/refs/heads/main/Bypass%20%E2%84%965.txt"
+WHOAHAOW_BYPASS12_URL = "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/bypass/bypass-12.txt"
+WHOAHAOW_BYPASS5_URL = "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/bypass/bypass-5.txt"
+ZIENG_VLESS_URL = "https://raw.githubusercontent.com/zieng2/wl/refs/heads/main/vless_lite.txt"
+NIKITA_URL = "https://raw.githubusercontent.com/nikita29a/FreeProxyList/main/mirror/1.txt"
 
 MAX_WORKERS = 20
 TEST_TIMEOUT = 5
@@ -72,11 +78,18 @@ def fetch_keys(url):
     # Очистка от рекламы в именах ключей
     cleaned_keys = []
     for key in keys:
-        # Убираем рекламные домены из имен
+        # Убираем рекламные домены и паттерны
         key = key.replace('@xex_vpn', '@server')
         key = key.replace('@XEX_VPN', '@server')
         key = key.replace('xex_vpn', 'server')
         key = key.replace('XEX_VPN', 'server')
+        # Убираем другие рекламные паттерны
+        key = key.replace('t.me/', '')
+        key = key.replace('telegram.me/', '')
+        key = key.replace('@V2rayNGn', '@server')
+        key = key.replace('@v2rayngvpn', '@server')
+        key = key.replace('V2rayNGn', 'server')
+        key = key.replace('v2rayngvpn', 'server')
         cleaned_keys.append(key)
 
     return cleaned_keys
@@ -216,15 +229,65 @@ def main():
         print(f"Ошибка загрузки TEMNUK Whitelist: {e}")
         temnuk_white_keys = []
 
-    print("Загружаем SilentGhost Whitelist ключи...")
+    print("Загружаем SilentGhost Whitelist №2 ключи...")
     try:
         silentghost_keys = fetch_keys(SILENTGHOST_URL)
-        print(f"Загружено {len(silentghost_keys)} SilentGhost ключей")
+        print(f"Загружено {len(silentghost_keys)} SilentGhost №2 ключей")
     except Exception as e:
-        print(f"Ошибка загрузки SilentGhost: {e}")
+        print(f"Ошибка загрузки SilentGhost №2: {e}")
         silentghost_keys = []
 
-    white_keys = list(dict.fromkeys(white_keys + temnuk_white_keys + silentghost_keys))
+    print("Загружаем SilentGhost Whitelist ключи...")
+    try:
+        silentghost_wl_keys = fetch_keys(SILENTGHOST_WHITELIST_URL)
+        print(f"Загружено {len(silentghost_wl_keys)} SilentGhost Whitelist ключей")
+    except Exception as e:
+        print(f"Ошибка загрузки SilentGhost Whitelist: {e}")
+        silentghost_wl_keys = []
+
+    print("Загружаем SilentGhost Bypass №5 ключи...")
+    try:
+        silentghost_bypass_keys = fetch_keys(SILENTGHOST_BYPASS_URL)
+        print(f"Загружено {len(silentghost_bypass_keys)} SilentGhost Bypass ключей")
+    except Exception as e:
+        print(f"Ошибка загрузки SilentGhost Bypass: {e}")
+        silentghost_bypass_keys = []
+
+    print("Загружаем Whoahaow Bypass-12 ключи...")
+    try:
+        whoahaow_12_keys = fetch_keys(WHOAHAOW_BYPASS12_URL)
+        print(f"Загружено {len(whoahaow_12_keys)} Whoahaow Bypass-12 ключей")
+    except Exception as e:
+        print(f"Ошибка загрузки Whoahaow Bypass-12: {e}")
+        whoahaow_12_keys = []
+
+    print("Загружаем Whoahaow Bypass-5 ключи...")
+    try:
+        whoahaow_5_keys = fetch_keys(WHOAHAOW_BYPASS5_URL)
+        print(f"Загружено {len(whoahaow_5_keys)} Whoahaow Bypass-5 ключей")
+    except Exception as e:
+        print(f"Ошибка загрузки Whoahaow Bypass-5: {e}")
+        whoahaow_5_keys = []
+
+    print("Загружаем Zieng VLESS Lite ключи...")
+    try:
+        zieng_keys = fetch_keys(ZIENG_VLESS_URL)
+        print(f"Загружено {len(zieng_keys)} Zieng ключей")
+    except Exception as e:
+        print(f"Ошибка загрузки Zieng: {e}")
+        zieng_keys = []
+
+    print("Загружаем Nikita FreeProxyList ключи...")
+    try:
+        nikita_keys = fetch_keys(NIKITA_URL)
+        print(f"Загружено {len(nikita_keys)} Nikita ключей")
+    except Exception as e:
+        print(f"Ошибка загрузки Nikita: {e}")
+        nikita_keys = []
+
+    white_keys = list(dict.fromkeys(white_keys + temnuk_white_keys + silentghost_keys +
+                                     silentghost_wl_keys + silentghost_bypass_keys +
+                                     whoahaow_12_keys + whoahaow_5_keys + zieng_keys + nikita_keys))
     print(f"Итого уникальных WHITE ключей: {len(white_keys)}")
 
     results = {
@@ -302,7 +365,7 @@ def generate_subscriptions(results):
     # Убираем дубликаты
     all_working_keys = list(dict.fromkeys(all_working_keys))
 
-    # WiFi подписка (все ключи)
+    # WiFi подписка (топ-200 серверов)
     wifi_header = """#profile-title: 🌐 VPN Keys Hub WiFi
 #announce: Совет: Настройки>Подписки>Сортировать по пингу, затем нажми на спидометр. Меньше ms лучше, регулярно нажимайте на 🔄️
 #profile-update-interval: 1
@@ -311,13 +374,16 @@ def generate_subscriptions(results):
 
 """
 
+    # Берем топ-200 для WiFi
+    wifi_keys = all_working_keys[:200] if len(all_working_keys) > 200 else all_working_keys
+
     with open("docs/subscribe_wifi.txt", "w", encoding="utf-8") as f:
         f.write(wifi_header)
-        f.write("\n".join(all_working_keys))
+        f.write("\n".join(wifi_keys))
 
-    print(f"✅ WiFi подписка: {len(all_working_keys)} ключей → docs/subscribe_wifi.txt")
+    print(f"✅ WiFi подписка: {len(wifi_keys)} ключей → docs/subscribe_wifi.txt")
 
-    # LTE подписка (топ-50 самых быстрых)
+    # LTE подписка (топ-150 самых быстрых)
     # Собираем ключи с latency
     keys_with_latency = []
 
@@ -334,9 +400,9 @@ def generate_subscriptions(results):
         if mode in results and results[mode].get('top10'):
             keys_with_latency.extend(results[mode]['top10'])
 
-    # Сортируем по latency и берем топ-50
+    # Сортируем по latency и берем топ-150
     keys_with_latency.sort(key=lambda x: x['latency_ms'])
-    top_lte_keys = [item['key'] for item in keys_with_latency[:50]]
+    top_lte_keys = [item['key'] for item in keys_with_latency[:150]]
     top_lte_keys = list(dict.fromkeys(top_lte_keys))  # Убираем дубликаты
 
     lte_header = """#profile-title: 📱 VPN Keys Hub LTE
@@ -351,7 +417,7 @@ def generate_subscriptions(results):
         f.write(lte_header)
         f.write("\n".join(top_lte_keys))
 
-    print(f"✅ LTE подписка: {len(top_lte_keys)} ключей (топ-50 быстрых) → docs/subscribe_lte.txt")
+    print(f"✅ LTE подписка: {len(top_lte_keys)} ключей (топ-150 быстрых) → docs/subscribe_lte.txt")
 
 
 if __name__ == "__main__":

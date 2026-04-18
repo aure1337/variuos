@@ -235,8 +235,9 @@ function copySubscription(type) {
   const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '');
   const subscriptionUrl = `${baseUrl}/subscribe_${type}.txt`;
 
+  const btn = document.querySelector(`button[onclick="copySubscription('${type}')"]`);
+
   navigator.clipboard.writeText(subscriptionUrl).then(() => {
-    const btn = event.target;
     const orig = btn.textContent;
     btn.textContent = '✅ Ссылка скопирована!';
     btn.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
@@ -244,6 +245,9 @@ function copySubscription(type) {
       btn.textContent = orig;
       btn.style.background = '';
     }, 2000);
+  }).catch(err => {
+    console.error('Ошибка копирования:', err);
+    alert('Не удалось скопировать. Ссылка: ' + subscriptionUrl);
   });
 }
 
