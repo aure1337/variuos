@@ -12,7 +12,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 BLACK_URL = "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/BLACK_VLESS_RUS.txt"
 BLACK_MOBILE_URL = "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/BLACK_VLESS_RUS_mobile.txt"
 WHITE_URL = "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/main/WHITE-CIDR-RU-checked.txt"
-ZIENG_URL = "https://raw.githubusercontent.com/zieng2/wl/refs/heads/main/vless_lite.txt"
+TEMNUK_URL = "https://raw.githubusercontent.com/Temnuk/naabuzil/refs/heads/main/whitelist"
 
 MAX_WORKERS = 20
 TEST_TIMEOUT = 5
@@ -34,16 +34,6 @@ WHITE_COUNTRIES = {
     "sweden":      ["sweden"],
     "netherlands": ["netherlands"],
     "poland":      ["poland"],
-    "france":      ["france"],
-    "uk":          ["united kingdom", "uk", "london"],
-    "usa":         ["united states", "usa", "america"],
-    "canada":      ["canada"],
-    "japan":       ["japan"],
-    "singapore":   ["singapore"],
-    "australia":   ["australia"],
-    "spain":       ["spain"],
-    "italy":       ["italy"],
-    "switzerland": ["switzerland"],
 }
 
 COUNTRIES_ALL_KEYWORDS = [kw for kws in COUNTRIES.values() for kw in kws]
@@ -188,20 +178,23 @@ def main():
     black_mobile_keys = fetch_keys(BLACK_MOBILE_URL)
     print(f"Загружено {len(black_mobile_keys)} BLACK mobile ключей")
 
-    print("Загружаем ZIENG ключи...")
-    try:
-        zieng_keys = fetch_keys(ZIENG_URL)
-        print(f"Загружено {len(zieng_keys)} ZIENG ключей")
-    except Exception as e:
-        print(f"Ошибка загрузки ZIENG: {e}")
-        zieng_keys = []
-
-    black_keys = list(dict.fromkeys(black_keys + black_mobile_keys + zieng_keys))
+    black_keys = list(dict.fromkeys(black_keys + black_mobile_keys))
     print(f"Итого уникальных BLACK ключей: {len(black_keys)}")
 
     print("Загружаем WHITE ключи...")
     white_keys = fetch_keys(WHITE_URL)
     print(f"Загружено {len(white_keys)} WHITE ключей")
+
+    print("Загружаем TEMNUK ключи...")
+    try:
+        temnuk_keys = fetch_keys(TEMNUK_URL)
+        print(f"Загружено {len(temnuk_keys)} TEMNUK ключей")
+    except Exception as e:
+        print(f"Ошибка загрузки TEMNUK: {e}")
+        temnuk_keys = []
+
+    white_keys = list(dict.fromkeys(white_keys + temnuk_keys))
+    print(f"Итого уникальных WHITE ключей: {len(white_keys)}")
 
     results = {
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
